@@ -49,27 +49,40 @@ class _LandingPageState extends State<LandingPage>
     );
   }
 
-  Widget buildLetter(String letter, int index) {
-    return TweenAnimationBuilder(
-      duration: Duration(milliseconds: 350 + (index * 120)),
-      tween: Tween<double>(begin: 0, end: 1),
-      curve: Curves.easeOut,
-      builder: (context, value, child) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 18 * (1 - value)),
-            child: child,
+  Widget buildLetter(
+    String letter,
+    int index,
+    int totalLetters,
+    double animationValue,
+  ) {
+    double step = 0.85 / totalLetters;
+    double startTurn = index * step;
+    double endTurn = startTurn + step;
+
+    double letterProgress = 0.0;
+    if (animationValue > startTurn) {
+      letterProgress =
+          ((animationValue - startTurn) / (endTurn - startTurn))
+              .clamp(0.0, 1.0);
+    }
+
+    double opacity = Curves.easeOut.transform(letterProgress);
+
+    double yOffset =
+        (15 * (1 - Curves.easeOutBack.transform(letterProgress))).toDouble();
+
+    return Opacity(
+      opacity: opacity,
+      child: Transform.translate(
+        offset: Offset(0, yOffset),
+        child: Text(
+          letter,
+          style: GoogleFonts.cormorantGaramond(
+            fontSize: 54,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 5,
+            color: Colors.white,
           ),
-        );
-      },
-      child: Text(
-        letter,
-        style: GoogleFonts.cormorantGaramond(
-          fontSize: 54,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 5,
-          color: Colors.white,
         ),
       ),
     );
@@ -83,13 +96,11 @@ class _LandingPageState extends State<LandingPage>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          /// BACKGROUND IMAGE
           Image.asset(
             "assets/images/image.png",
             fit: BoxFit.cover,
           ),
 
-          /// DARK LUXURY OVERLAY
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -104,7 +115,6 @@ class _LandingPageState extends State<LandingPage>
             ),
           ),
 
-          /// CONTENT
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -112,7 +122,6 @@ class _LandingPageState extends State<LandingPage>
                 children: [
                   const Spacer(),
 
-                  /// GLASS HERO CARD
                   ClipRRect(
                     borderRadius: BorderRadius.circular(38),
                     child: BackdropFilter(
@@ -135,28 +144,45 @@ class _LandingPageState extends State<LandingPage>
                         ),
                         child: Column(
                           children: [
-                            /// PERFUME SPRAY ANIMATION
-                            SizedBox(
-                              height: 90,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  AnimatedBuilder(
-                                    animation: _iconController,
-                                    builder: (context, child) {
-                                      return Positioned(
-                                        left:
-                                            MediaQuery.of(context)
+                            AnimatedBuilder(
+                              animation: _iconController,
+                              builder: (context, child) {
+                                return SizedBox(
+                                  height: 90,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: List.generate(
+                                          letters.length,
+                                          (index) => buildLetter(
+                                            letters[index],
+                                            index,
+                                            letters.length,
+                                            _iconController.value,
+                                          ),
+                                        ),
+                                      ),
+
+                                      Positioned(
+                                        left: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.05 +
+                                                0.02 +
                                             (MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.55 *
+                                                0.62 *
                                                 _iconController.value),
                                         child: Opacity(
-                                          opacity: 0.9,
+                                          opacity: _iconController.value > 0.95
+                                              ? (1.0 -
+                                                  (_iconController.value -
+                                                          0.95) /
+                                                      0.05)
+                                              : 0.9,
                                           child: Row(
                                             children: [
                                               const Icon(
@@ -165,35 +191,22 @@ class _LandingPageState extends State<LandingPage>
                                                 size: 28,
                                               ),
                                               Container(
-                                                width: 45,
-                                                height: 2,
+                                                width: 35,
+                                                height: 1.5,
                                                 margin:
                                                     const EdgeInsets.symmetric(
-                                                  horizontal: 6,
-                                                ),
-                                                color: Colors.white70,
+                                                        horizontal: 4),
+                                                color: Colors.white
+                                                    .withOpacity(0.4),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-
-                                  /// BRAND NAME
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: List.generate(
-                                      letters.length,
-                                      (index) => buildLetter(
-                                        letters[index],
-                                        index,
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
 
                             const SizedBox(height: 18),
@@ -211,7 +224,6 @@ class _LandingPageState extends State<LandingPage>
 
                             const SizedBox(height: 30),
 
-                            /// ENTER BUTTON
                             GestureDetector(
                               onTap: _goToHome,
                               child: Container(
@@ -235,9 +247,9 @@ class _LandingPageState extends State<LandingPage>
                                   ],
                                 ),
                                 child: const Icon(
-                                  Icons.arrow_forward_rounded,
+                                  Icons.arrow_forward_ios,
                                   color: Colors.white,
-                                  size: 30,
+                                  size: 20,
                                 ),
                               ),
                             ),
@@ -249,7 +261,6 @@ class _LandingPageState extends State<LandingPage>
 
                   const SizedBox(height: 40),
 
-                  /// LOADING DOTS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(

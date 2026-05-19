@@ -30,10 +30,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             width: double.infinity,
             child: Hero(
               tag: product.id,
-              child: Image.network(
+              child: Image.asset(
                 product.image,
                 fit: BoxFit.cover,
-              ),
+              )
             ),
           ),
 
@@ -369,7 +369,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           ),
                         ),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 10),
                       ],
                     ),
                   ),

@@ -392,7 +392,7 @@ class _ProductListPageState extends State<ProductListPage> {
                       tag: product.id,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: Image.network(
+                        child: Image.asset(
                           product.image,
                           fit: BoxFit.cover,
                           width: double.infinity,
@@ -434,7 +434,7 @@ class _ProductListPageState extends State<ProductListPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "\$${product.price}",
+                        "${product.price}",
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
